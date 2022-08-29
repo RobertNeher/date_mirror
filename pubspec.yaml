@@ -15,11 +15,18 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
+  flutter_launcher_icons:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints:
 
 flutter:
   uses-material-design: true
   assets:
     - assets/images/
+
+flutter_icons:
+  android: true
+  image_path: "assets\\images\\mirror.png"
+  adaptive_icon_background: "assets\\images\\mirror.png"
+  adaptive_icon_foreground: "assets\\images\\mirror.png"
