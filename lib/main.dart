@@ -35,6 +35,7 @@ class _MirrorDateState extends State<MirrorDate> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Mirror Dates ${DateTime.now().year}',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -72,6 +73,7 @@ class _MirrorDatePageState extends State<MirrorDatePage> {
       ));
     }
     _selectedEvent = widget.mirrorDates.keys.first;
+    _tec.text = _selectedEvent;
     super.initState();
   }
 
@@ -83,50 +85,89 @@ class _MirrorDatePageState extends State<MirrorDatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        centerTitle: true,
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          DropdownButton(
-              items: _items,
-              value: _selectedEvent,
-              onChanged: (value) {
-                _selectedEvent = value!;
-                _tec.text = _df.format(widget.mirrorDates[_selectedEvent]!);
-                setState(() {});
-              }),
-          const SizedBox(
-            height: 20,
+        appBar: AppBar(
+          title: Text(widget.title),
+          centerTitle: true,
+        ),
+        body: Align(
+          alignment: Alignment.topCenter,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const SizedBox(width: 20),
+                    DropdownButton(
+                      items: _items,
+                      style: const TextStyle(
+                        fontFamily: "Roboto",
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      value: _selectedEvent,
+                      onChanged: (value) {
+                        _selectedEvent = value!;
+                        _tec.text =
+                            _df.format(widget.mirrorDates[_selectedEvent]!);
+                        setState(() {});
+                      },
+                    ),
+                    Expanded(
+                        child: TextField(
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                      ),
+                      controller: _tec,
+                      decoration:
+                          const InputDecoration(border: InputBorder.none),
+                      readOnly: true,
+                    )),
+                  ]),
+              const SizedBox(
+                height: 20,
+              ),
+              CustomPaint(
+                size: const Size(350, 50),
+                painter: DateTimeLine(_selectedEvent, widget.mirrorDates),
+              ),
+              Expanded(child: Container()),
+            ],
           ),
-          TextField(
-            textAlign: TextAlign.left,
-            controller: _tec,
-            // readOnly: true,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          CustomPaint(
-            size: const Size(350, 50),
-            painter: DateLinePainter(
-                eventLabel:
-                    "$_selectedEvent\n${_df.format(widget.mirrorDates[_selectedEvent]!)}",
-                mirrorLabel:
-                    "Mirror Date\n${_mirrorDateLabel(widget.mirrorDates[_selectedEvent]!, _df)}",
-                dayDiff: widget.mirrorDates[_selectedEvent]!
-                    .difference(DateTime.now())
-                    .inDays),
-          )
-        ],
-      ),
-    );
+        ));
   }
 }
 
-String _mirrorDateLabel(DateTime baseDate, DateFormat df) {
+String mirrorDateLabel(DateTime baseDate, DateFormat df) {
   int diff = baseDate.difference(DateTime.now()).inDays;
-  return df.format(DateTime.now().add(Duration(days: diff)));
+  return df.format(DateTime.now().add(Duration(days: -diff)));
+}
+
+CustomPainter DateTimeLine(
+    String selectedEvent, Map<String, DateTime> mirrorDates) {
+  final DateFormat df = DateFormat('dd.MM.yyyy');
+  final today = DateTime.now();
+
+  if (mirrorDates[selectedEvent]!.compareTo(today) > 0) {
+    return DateLinePainter(
+        eventLabel: '$selectedEvent\n${df.format(mirrorDates[selectedEvent]!)}',
+        mirrorLabel:
+            'Mirror Date\n${mirrorDateLabel(mirrorDates[selectedEvent]!, df)}',
+        dayDiff: mirrorDates[selectedEvent]!.difference(DateTime.now()).inDays);
+  } else if (mirrorDates[selectedEvent]!.compareTo(today) == 0) {
+    return DateLinePainter(
+        eventLabel: '',
+        mirrorLabel:
+            '${mirrorDateLabel(mirrorDates[selectedEvent]!, df)}\n(Today)',
+        dayDiff: mirrorDates[selectedEvent]!.difference(DateTime.now()).inDays);
+  }
+  return DateLinePainter(
+      eventLabel:
+          'Mirror Date\n${mirrorDateLabel(mirrorDates[selectedEvent]!, df)}',
+      mirrorLabel: '$selectedEvent\n${df.format(mirrorDates[selectedEvent]!)}',
+      dayDiff: -mirrorDates[selectedEvent]!.difference(DateTime.now()).inDays);
 }

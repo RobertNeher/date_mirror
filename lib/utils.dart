@@ -7,8 +7,9 @@ extension DateFormatter on DateTime {
   }
 }
 
+// Compare Date extension
 extension DateOnlyCompare on DateTime {
-  bool isSameDate(DateTime other) {
+  bool compare(DateTime other) {
     return (year == other.year && month == other.month && day == other.day);
   }
 }
