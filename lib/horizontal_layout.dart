@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'utils.dart';
 
-class DateLinePainter extends CustomPainter {
+class HorizontalTimelinePainter extends CustomPainter {
   String eventLabel;
   String mirrorLabel;
   int dayDiff;
@@ -19,7 +19,7 @@ class DateLinePainter extends CustomPainter {
     fontWeight: FontWeight.normal,
     color: Colors.black,
   );
-  DateLinePainter(
+  HorizontalTimelinePainter(
       {this.eventLabel = "", this.mirrorLabel = "", this.dayDiff = 0});
 
   @override

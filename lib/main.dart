@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'graphics.dart';
+import 'horizontal_layout.dart';
 
 void main() {
   runApp(const MirrorDate());
@@ -133,7 +133,7 @@ class _MirrorDatePageState extends State<MirrorDatePage> {
               ),
               CustomPaint(
                 size: const Size(350, 50),
-                painter: DateTimeLine(_selectedEvent, widget.mirrorDates),
+                painter: HorizontalTimeLine(_selectedEvent, widget.mirrorDates),
               ),
               Expanded(child: Container()),
             ],
@@ -147,25 +147,25 @@ String mirrorDateLabel(DateTime baseDate, DateFormat df) {
   return df.format(DateTime.now().add(Duration(days: -diff)));
 }
 
-CustomPainter DateTimeLine(
+CustomPainter HorizontalTimeLine(
     String selectedEvent, Map<String, DateTime> mirrorDates) {
   final DateFormat df = DateFormat('dd.MM.yyyy');
   final today = DateTime.now();
 
   if (mirrorDates[selectedEvent]!.compareTo(today) > 0) {
-    return DateLinePainter(
+    return HorizontalTimelinePainter(
         eventLabel: '$selectedEvent\n${df.format(mirrorDates[selectedEvent]!)}',
         mirrorLabel:
             'Mirror Date\n${mirrorDateLabel(mirrorDates[selectedEvent]!, df)}',
         dayDiff: mirrorDates[selectedEvent]!.difference(DateTime.now()).inDays);
   } else if (mirrorDates[selectedEvent]!.compareTo(today) == 0) {
-    return DateLinePainter(
+    return HorizontalTimelinePainter(
         eventLabel: '',
         mirrorLabel:
             '${mirrorDateLabel(mirrorDates[selectedEvent]!, df)}\n(Today)',
         dayDiff: mirrorDates[selectedEvent]!.difference(DateTime.now()).inDays);
   }
-  return DateLinePainter(
+  return HorizontalTimelinePainter(
       eventLabel:
           'Mirror Date\n${mirrorDateLabel(mirrorDates[selectedEvent]!, df)}',
       mirrorLabel: '$selectedEvent\n${df.format(mirrorDates[selectedEvent]!)}',
