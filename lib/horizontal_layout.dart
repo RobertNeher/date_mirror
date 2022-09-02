@@ -24,70 +24,68 @@ class HorizontalTimelinePainter extends CustomPainter {
 
   @override
   paint(Canvas canvas, Size size) {
+    double xOffset = 20;
     double height = size.height;
-    double width = size.width;
+    double width = size.width - xOffset;
 
     Paint paint = Paint()
       ..color = Colors.green
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
+      ..strokeWidth = 5;
 
     // draw base timeline
-    canvas.drawLine(
-        Offset(0, height * 0.1), Offset(width, height * 0.1), paint);
+    double posY = height * 0.1;
+    double posX = xOffset / 2;
 
-    // labelPainter
-    String centerText =
-        eventLabel.isEmpty ? mirrorLabel : 'Today\n${DateTime.now().format()}';
-    canvas.drawLine(Offset(width / 2, 0), Offset(width / 2, 10), paint);
-    labelPainter.text = TextSpan(text: centerText, style: labelStyle);
+    canvas.drawLine(Offset(posX, posY), Offset(posX + width, posY), paint);
+
+    // mirrorday
+    posX = xOffset + width * 0.05;
+    canvas.drawLine(Offset(posX, posY - 5), Offset(posX, posY + 5), paint);
+    labelPainter.text = TextSpan(text: mirrorLabel, style: labelStyle);
+    labelPainter.layout(minWidth: 0, maxWidth: double.maxFinite);
+    labelPainter.paint(canvas,
+        Offset(posX - labelPainter.width / 2, posY + labelPainter.height / 2));
+
+    // mirror day difference
+    posX = xOffset + width * 0.25;
+    canvas.drawLine(Offset(posX, posY - 5), Offset(posX, posY + 5), paint);
+    labelPainter.text =
+        TextSpan(text: 'Distance\n-$dayDiff days', style: labelStyle);
+    labelPainter.layout(minWidth: 0, maxWidth: double.maxFinite);
+    labelPainter.paint(canvas,
+        Offset(posX - labelPainter.width / 2, posY - labelPainter.height - 10));
+
+    // selected Event
+    posX = xOffset + width * 0.45;
+
+    labelPainter.text = TextSpan(text: eventLabel, style: labelStyle);
+    canvas.drawLine(Offset(posX, posY - 5), Offset(posX, posY + 5), paint);
+    labelPainter.text = TextSpan(text: eventLabel, style: labelStyle);
+    labelPainter.layout(minWidth: 0, maxWidth: double.maxFinite);
+    labelPainter.paint(canvas,
+        Offset(posX - labelPainter.width / 2, posY + labelPainter.height / 2));
+
+    // day difference
+    posX = xOffset + width * 0.65;
+    canvas.drawLine(Offset(posX, posY - 5), Offset(posX, posY + 5), paint);
+    labelPainter.text =
+        TextSpan(text: 'Distance\n+$dayDiff days', style: labelStyle);
+    labelPainter.layout(minWidth: 0, maxWidth: double.maxFinite);
+    labelPainter.paint(canvas,
+        Offset(posX - labelPainter.width / 2, posY - labelPainter.height - 10));
+
+    // Today
+    posX = xOffset + width * 0.85;
+    labelPainter.text =
+        TextSpan(text: 'Today\n${DateTime.now().format()}', style: labelStyle);
+    canvas.drawLine(Offset(posX, posY - 5), Offset(posX, posY + 5), paint);
     labelPainter.layout(minWidth: 0, maxWidth: double.maxFinite);
     labelPainter.paint(
         canvas,
         Offset(
-            width / 2 - labelPainter.width / 2, 10 + labelPainter.height / 4));
-
-    // this happens only when selected event is equal to actual date
-    if (eventLabel.isNotEmpty) {
-      // day difference
-      double posX = width * 0.7;
-      canvas.drawLine(Offset(posX, 0), Offset(posX, 10), paint);
-      labelPainter.text =
-          TextSpan(text: 'Distance\n+$dayDiff days', style: labelStyle);
-      labelPainter.layout(minWidth: 0, maxWidth: double.maxFinite);
-      labelPainter.paint(canvas,
-          Offset(posX - labelPainter.width / 2, 10 + labelPainter.height / 4));
-
-      // Selected event
-      posX = width * 0.9;
-      labelPainter.text = TextSpan(
-          text: '$eventLabel\n${DateTime.now().format()}', style: labelStyle);
-      canvas.drawLine(Offset(posX, 0), Offset(posX, 10), paint);
-      labelPainter.text = TextSpan(text: eventLabel, style: labelStyle);
-      labelPainter.layout(minWidth: 0, maxWidth: double.maxFinite);
-      labelPainter.paint(
-          canvas,
-          Offset(
-              posX - (labelPainter.width / 2), 10 + labelPainter.height / 4));
-
-      // mirror day difference
-      posX = width * 0.3;
-      canvas.drawLine(Offset(posX, 0), Offset(posX, 10), paint);
-      labelPainter.text =
-          TextSpan(text: 'Distance\n-${dayDiff} days', style: labelStyle);
-      labelPainter.layout(minWidth: 0, maxWidth: double.maxFinite);
-      labelPainter.paint(canvas,
-          Offset(posX - labelPainter.width / 2, 10 + labelPainter.height / 4));
-
-      //mirrorday
-      posX = width * 0.1;
-      canvas.drawLine(Offset(posX, 0), Offset(posX, 10), paint);
-      labelPainter.text = TextSpan(text: mirrorLabel, style: labelStyle);
-      labelPainter.layout(minWidth: 0, maxWidth: double.maxFinite);
-      labelPainter.paint(canvas,
-          Offset(posX - labelPainter.width / 2, 10 + labelPainter.height / 4));
-    }
+            posX - (labelPainter.width / 2), posY + labelPainter.height / 2));
   }
 
   @override
