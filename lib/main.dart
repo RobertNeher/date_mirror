@@ -1,16 +1,16 @@
-import 'package:date_mirror/vertical_layout.dart';
 import 'package:flutter/material.dart';
-// import 'package:intl/intl.dart';
+import 'package:date_mirror/horizontal_layout.dart';
+import 'package:date_mirror/vertical_layout.dart';
 
-import 'horizontal_layout.dart';
-import 'utils.dart';
+import 'package:date_mirror/load_solar_data.dart';
+import 'package:date_mirror/utils.dart';
 
 void main() {
-  runApp(MirrorDate());
+  runApp(const MirrorDate());
 }
 
 class MirrorDate extends StatefulWidget {
-  MirrorDate({super.key});
+  const MirrorDate({super.key});
 
   @override
   State<MirrorDate> createState() => _MirrorDateState();
@@ -18,19 +18,15 @@ class MirrorDate extends StatefulWidget {
 
 class _MirrorDateState extends State<MirrorDate> {
   final Set<String> _layouts = <String>{"Vertical", "Horizontal"};
-  late Map<String, DateTime> _mirrorDates;
+  late Map<String, Object> _mirrorDates;
 
   @override
   void initState() {
     String year = DateTime.now().year.toString();
-    _mirrorDates = {
-      'New Year': DateTime.parse('$year-01-01'),
-      'Spring Equinox': DateTime.parse('$year-03-20'),
-      'Summer Solstice': DateTime.parse('$year-06-21'),
-      'Fall Equinox': DateTime.parse('$year-09-20'),
-      'Winter Solstice': DateTime.parse('$year-12-20'),
-      'Year\'s End': DateTime.parse('$year-12-31'),
-    };
+
+    if (loadSolarData(int.parse(year)).isNotEmpty) {
+      _mirrorDates = loadSolarData(int.parse(year));
+    }
     super.initState();
   }
 
@@ -57,7 +53,7 @@ class MirrorDatePage extends StatefulWidget {
       required this.mirrorDates,
       required this.layouts});
   final String title;
-  final Map<String, DateTime> mirrorDates;
+  final Map<String, Object> mirrorDates;
   final Set<String> layouts;
 
   @override
@@ -94,7 +90,7 @@ class _MirrorDatePageState extends State<MirrorDatePage> {
     _vertical = ("Vertical" == widget.layouts.first);
     _selectedEvent = widget.mirrorDates.keys.first;
     _layout = widget.layouts.first;
-    _tec.text = (widget.mirrorDates.values.first).format();
+    _tec.text = (widget.mirrorDates.values.first as DateTime).format();
     _timeLine = VerticalTimelinePainter(
         eventLabel: widget.mirrorDates.keys.first, mirrorLabel: "", dayDiff: 0);
     super.initState();
@@ -158,7 +154,8 @@ class _MirrorDatePageState extends State<MirrorDatePage> {
                       onChanged: (value) {
                         _selectedEvent = value!;
                         _tec.text =
-                            (widget.mirrorDates[_selectedEvent]!).format();
+                            (widget.mirrorDates[_selectedEvent]! as DateTime)
+                                .format();
                         setState(() {});
                       },
                     ),
@@ -191,25 +188,29 @@ class _MirrorDatePageState extends State<MirrorDatePage> {
 }
 
 CustomPainter HorizontalTimeline(
-    String selectedEvent, Map<String, DateTime> mirrorDates) {
-  final int dayDiff =
-      mirrorDates[selectedEvent]!.difference(DateTime.now()).inDays;
+    String selectedEvent, Map<String, Object> mirrorDates) {
+  final int dayDiff = (mirrorDates[selectedEvent]! as DateTime)
+      .difference(DateTime.now())
+      .inDays;
 
   return HorizontalTimelinePainter(
-      eventLabel: '$selectedEvent\n${(mirrorDates[selectedEvent]!).format()}',
+      eventLabel:
+          '$selectedEvent\n${(mirrorDates[selectedEvent]! as DateTime).format()}',
       mirrorLabel:
-          'Mirror Date\n${(mirrorDates[selectedEvent]!).add(Duration(days: dayDiff)).format()}',
+          'Mirror Date\n${(mirrorDates[selectedEvent]! as DateTime).add(Duration(days: dayDiff)).format()}',
       dayDiff: dayDiff);
 }
 
 CustomPainter VerticalTimeline(
-    String selectedEvent, Map<String, DateTime> mirrorDates) {
-  final int dayDiff =
-      mirrorDates[selectedEvent]!.difference(DateTime.now()).inDays;
+    String selectedEvent, Map<String, Object> mirrorDates) {
+  final int dayDiff = (mirrorDates[selectedEvent]! as DateTime)
+      .difference(DateTime.now())
+      .inDays;
 
   return VerticalTimelinePainter(
-      eventLabel: '$selectedEvent\n${(mirrorDates[selectedEvent]!).format()}',
+      eventLabel:
+          '$selectedEvent\n${(mirrorDates[selectedEvent]! as DateTime).format()}',
       mirrorLabel:
-          'Mirror Date\n${(mirrorDates[selectedEvent]!).add(Duration(days: dayDiff)).format()}}',
+          'Mirror Date\n${(mirrorDates[selectedEvent]! as DateTime).add(Duration(days: dayDiff)).format()}}',
       dayDiff: dayDiff);
 }
